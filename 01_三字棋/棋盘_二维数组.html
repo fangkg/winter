@@ -1,9 +1,9 @@
 <!--
  * @Author: fangkg
  * @Date: 2021-04-10 21:12:31
- * @LastEditTime: 2021-04-10 22:04:56
+ * @LastEditTime: 2021-04-11 10:46:36
  * @LastEditors: Please set LastEditors
- * @Description: 三字棋
+ * @Description: 三字棋_二维数组
  * @FilePath: \cloudapp-dashboardd:\GeekTime\winter\01_学习方法与构建知识体系\practice\棋盘.html
 -->
 <!DOCTYPE html>
@@ -23,7 +23,7 @@
     // 棋盘3*3布局，使用二维数组表示
     // 棋盘三种状态: 空0 圈2 叉1
     let pattern = [
-        [2, 0, 0],
+        [0, 2, 0],
         [0, 1, 0],
         [0, 0, 0]
     ];
@@ -40,8 +40,8 @@
             for(let j = 0; j < 3; j++) {
                 let cell = document.createElement('div');
                 cell.classList.add('cell');
-                cell.innerText = pattern[j][i] == 2 ? "X" :
-                    pattern[j][i] == 1 ? "O" : "";
+                cell.innerText = pattern[i][j] == 2 ? "X" :
+                    pattern[i][j] == 1 ? "O" : "";
                 // 格子事件监听
                 cell.addEventListener("click", () => move(j, i));
                 board.appendChild(cell);
@@ -124,8 +124,44 @@
                 // 给空位置设置一个值，代入check函数计算
                 tmp[i][j] = color;
                 if(check(tmp, color)) {
-                    return true;
+                    // return true;
+                    // 添加point
+                    return [j, i];
                 }
+            }
+        }
+        // return false;
+        return null;
+    }
+
+    function bestChoice(pattern, color) {
+        let p;
+        if(p = willWin(pattern, color)) {
+            return {
+                point: p,
+                result: 1
+            }
+            // 对方最好的选择是我方最差的选择，我方输
+            let result = -2;
+            let point = null;
+            for(let i = 0; i < 3; i++) {
+                for(let j = 0; j < 3; j++) {
+                    if(pattern[i][j])
+                        continue;
+                    let tmp = clone(pattern);
+                    tmp[i][j] = color;
+                    let r = bestChoice(tmp, 3 - color).result;
+
+                    if(-r > result) {
+                        result = -r;
+                        point = [j, i];
+                    }
+                }
+            }
+
+            return {
+                point: point,
+                result: point ? result : 0
             }
         }
     }
